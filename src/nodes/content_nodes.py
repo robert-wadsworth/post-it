@@ -91,26 +91,7 @@ def generate_image_with_openai(state: MessageState) -> MessageState:
     # Generate the image using OpenAI
     image_response = client.images.generate(
         model="dall-e-3",
-        prompt=f"""
-        You are an expert Prompt Engineer that generates prompts for images to accompany social media posts.
-        Given the post, generate a detailed, specific prompt for an image that would accompany the post.
-        The prompt should be descriptive and include details about:
-        - Lighting and composition
-        - Style and mood
-        - Important visual elements
-        - Quality characteristics (professional, high-resolution, detailed)
-
-        Important Rules:
-        - The image should never have text in it.
-        - The image should be a single image, not a collage of images.
-        - The image should be a high-resolution image, not a low-resolution image.
-        
-        Return only the image prompt, nothing else.
-        Make it specific and detailed to ensure high-quality image generation.
-
-        --- image prompt below ---
-        {prompt}
-        """,
+        prompt=prompt,
         n=1,
         size="1024x1024",
     )
