@@ -6,6 +6,12 @@ load_dotenv()
 from langchain_core.messages import HumanMessage  # noqa: E402
 from langgraph.graph import END, StateGraph  # noqa: E402
 
+from nodes.constants import (  # noqa: E402
+    DRAFT_TEXT,
+    GENERATE_IMAGE,
+    GENERATE_IMAGE_PROMPT,
+    REVIEW_DRAFT,
+)
 from nodes.content_nodes import (  # noqa: E402
     draft_text_node,
     generate_image_prompt_node,
@@ -13,11 +19,6 @@ from nodes.content_nodes import (  # noqa: E402
     review_draft_node,
 )
 from state import MessageState  # noqa: E402
-
-DRAFT_TEXT = "draft_text"
-REVIEW_DRAFT = "review_draft"
-GENERATE_IMAGE_PROMPT = "generate_image_prompt"
-GENERATE_IMAGE = "generate_image"
 
 
 def should_continue(state: MessageState) -> str:
@@ -51,7 +52,7 @@ agent = agent_builder.compile()
 
 if __name__ == "__main__":
     query = """
-    Write a post about the elections with the theme "Tough night for old white guys."
+    Write a post about artificial intelligence and the most common use cases for agentic workflows."
     """
     inputs = {"messages": [HumanMessage(content=query)]}
     result = agent.invoke(inputs)
