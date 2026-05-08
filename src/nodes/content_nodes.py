@@ -71,10 +71,9 @@ def generate_image_prompt_node(state: MessageState) -> MessageState:
     messages = [
         SystemMessage(
             content="""
-            You are an expert Prompt Engineer that generates prompts for images to accompany social media posts.
-            Given the post, generate a prompt for an image that would accompany the post.
-            You will need to return the prompt.
-            Do not provide a revised version of the post, only suggest changes.
+            You are an expert prompt engineer specializing in DALL-E image generation.
+            Given a social media post, generate a vivid, specific image prompt that would
+            visually complement the post's message. Return only the image prompt, nothing else.
             """
         )
     ] + state["messages"]
