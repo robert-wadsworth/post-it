@@ -46,7 +46,7 @@ agent_builder.add_conditional_edges(
 )
 agent_builder.add_edge(REVIEW_DRAFT, DRAFT_TEXT)
 agent_builder.add_edge(GENERATE_IMAGE_PROMPT, GENERATE_IMAGE)
-agent_builder.add_edge(GENERATE_IMAGE_PROMPT, END)
+agent_builder.add_edge(GENERATE_IMAGE, END)
 
 agent = agent_builder.compile()
 
