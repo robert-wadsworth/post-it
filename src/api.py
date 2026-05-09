@@ -24,6 +24,9 @@ class GenerateRequest(BaseModel):
 class GenerateResponse(BaseModel):
     text: str
     image_url: Optional[str] = None
+    image_prompt: str
+    review_feedback: str
+    revision_count: int
     llm_calls: int
     request_id: str
 
@@ -44,16 +47,13 @@ async def generate_post(request: GenerateRequest):
         inputs = {"messages": [HumanMessage(content=request.prompt)]}
         result = await anyio.to_thread.run_sync(lambda: agent.invoke(inputs))
 
-        text = ""
-        for message in reversed(result.get("messages", [])):
-            if hasattr(message, "content"):
-                text = message.content
-                break
-
         logger.info("Agent invocation completed", extra={"request_id": request_id})
         return GenerateResponse(
-            text=text,
+            text=result.get("draft_text", ""),
             image_url=result.get("image_url"),
+            image_prompt=result.get("image_prompt", ""),
+            review_feedback=result.get("review_feedback", ""),
+            revision_count=result.get("revision_count", 0),
             llm_calls=result.get("llm_calls", 0),
             request_id=request_id,
         )

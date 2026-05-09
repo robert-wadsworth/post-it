@@ -13,6 +13,10 @@ def make_agent_result(
     return {
         "messages": [AIMessage(content=text)],
         "image_url": image_url,
+        "draft_text": text,
+        "image_prompt": "A generated image prompt",
+        "review_feedback": "Looks great!",
+        "revision_count": 1,
         "llm_calls": 3,
     }
 
@@ -31,6 +35,9 @@ async def test_generate_returns_200() -> None:
     data = response.json()
     assert data["text"] == "Here's your post!"
     assert data["image_url"] == "https://example.com/image.png"
+    assert data["image_prompt"] == "A generated image prompt"
+    assert data["review_feedback"] == "Looks great!"
+    assert data["revision_count"] == 1
     assert data["llm_calls"] == 3
     assert "request_id" in data
 
