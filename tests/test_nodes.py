@@ -3,19 +3,17 @@ from unittest.mock import MagicMock, patch
 import pytest
 from langchain_core.messages import AIMessage, HumanMessage
 
-from nodes.constants import DRAFT_TEXT, GENERATE_IMAGE, GENERATE_IMAGE_PROMPT, REVIEW_DRAFT
 from nodes.content_nodes import (
-    ReviewDecision,
     draft_text_node,
     generate_image_prompt_node,
     generate_image_with_openai,
     review_draft_node,
 )
+from schemas import ReviewDecision
 
 
 def make_state(messages: list | None = None, llm_calls: int = 0) -> dict:
     return {
-        "node_name": "",
         "messages": messages or [],
         "llm_calls": llm_calls,
         "approved": False,
@@ -30,7 +28,6 @@ def test_draft_text_node(mock_model: MagicMock) -> None:
 
     result = draft_text_node(make_state(messages=[HumanMessage(content="Write about AI")]))
 
-    assert result["node_name"] == DRAFT_TEXT
     assert result["messages"] == [mock_response]
     assert result["llm_calls"] == 1
 
@@ -43,7 +40,6 @@ def test_review_draft_node_approved(mock_model: MagicMock) -> None:
 
     result = review_draft_node(make_state(messages=[HumanMessage(content="Draft post")]))
 
-    assert result["node_name"] == REVIEW_DRAFT
     assert result["approved"] is True
     assert result["messages"][0].content == "Looks great!"
     assert result["llm_calls"] == 1
@@ -68,7 +64,6 @@ def test_generate_image_prompt_node(mock_model: MagicMock) -> None:
 
     result = generate_image_prompt_node(make_state(messages=[HumanMessage(content="Post about AI")]))
 
-    assert result["node_name"] == GENERATE_IMAGE_PROMPT
     assert result["messages"] == [mock_response]
     assert result["llm_calls"] == 1
 
@@ -81,7 +76,6 @@ def test_generate_image_with_openai(mock_client: MagicMock) -> None:
         make_state(messages=[HumanMessage(content="A vivid digital painting")])
     )
 
-    assert result["node_name"] == GENERATE_IMAGE
     assert result["image_url"] == "https://example.com/image.png"
 
 
