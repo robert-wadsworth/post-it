@@ -24,7 +24,10 @@ from state import MessageState  # noqa: E402
 
 def should_continue(state: MessageState) -> str:
     """Determine if the agent should continue"""
-    if state.get("approved", False) or state.get("revision_count", 0) >= settings.max_revisions:
+    if (
+        state.get("approved", False)
+        or state.get("revision_count", 0) >= settings.max_revisions
+    ):
         return GENERATE_IMAGE_PROMPT
     return REVIEW_DRAFT
 

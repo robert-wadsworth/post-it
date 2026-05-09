@@ -12,7 +12,9 @@ from nodes.content_nodes import (
 from schemas import ReviewDecision
 
 
-def make_state(messages: list | None = None, llm_calls: int = 0, revision_count: int = 0) -> dict:
+def make_state(
+    messages: list | None = None, llm_calls: int = 0, revision_count: int = 0
+) -> dict:
     return {
         "messages": messages or [],
         "llm_calls": llm_calls,
