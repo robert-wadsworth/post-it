@@ -23,7 +23,7 @@ from state import MessageState  # noqa: E402
 
 def should_continue(state: MessageState) -> str:
     """Determine if the agent should continue"""
-    if state.get("llm_calls", 0) > 3:
+    if state.get("approved", False) or state.get("llm_calls", 0) > 5:
         return GENERATE_IMAGE_PROMPT
     return REVIEW_DRAFT
 
