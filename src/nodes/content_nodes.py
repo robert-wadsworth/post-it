@@ -11,6 +11,11 @@ from nodes.constants import (
     GENERATE_IMAGE_PROMPT,
     REVIEW_DRAFT,
 )
+from nodes.prompts import (
+    DRAFT_TEXT_SYSTEM_PROMPT,
+    GENERATE_IMAGE_PROMPT_SYSTEM_PROMPT,
+    REVIEW_DRAFT_SYSTEM_PROMPT,
+)
 from state import MessageState
 
 client = OpenAI()
@@ -26,17 +31,7 @@ class ReviewDecision(BaseModel):
 def draft_text_node(state: MessageState) -> MessageState:
     """Create an initial draft for a social media post"""
 
-    messages = [
-        SystemMessage(
-            content="""
-            You are a helpful assistant that creates social media posts.
-            You will be given a topic and you will need to create a draft of a social media post.
-            You will need to return the draft of the post.
-
-            If the user provides feedback, revise the most recent draft of the post to address the feedback.
-            """
-        )
-    ] + state["messages"]
+    messages = [SystemMessage(content=DRAFT_TEXT_SYSTEM_PROMPT)] + state["messages"]
 
     response = model.invoke(messages)
 
@@ -50,16 +45,7 @@ def draft_text_node(state: MessageState) -> MessageState:
 def review_draft_node(state: MessageState) -> MessageState:
     """Review the draft for accuracy, clarity, and best practices"""
 
-    messages = [
-        SystemMessage(
-            content="""
-            You are a helpful assistant that reviews social media posts for accuracy and clarity and best practices.
-            You will be given a draft of a social media post and you will need to review it for accuracy, clarity, and best practices.
-            You will need to return a list of suggestions for the post.
-            Do not provide a revised version of the post, only suggest changes.
-            """
-        )
-    ] + state["messages"]
+    messages = [SystemMessage(content=REVIEW_DRAFT_SYSTEM_PROMPT)] + state["messages"]
 
     decision: ReviewDecision = model.with_structured_output(ReviewDecision).invoke(messages)
 
@@ -74,15 +60,7 @@ def review_draft_node(state: MessageState) -> MessageState:
 def generate_image_prompt_node(state: MessageState) -> MessageState:
     """Generate a prompt for an image to accompany the post"""
 
-    messages = [
-        SystemMessage(
-            content="""
-            You are an expert prompt engineer specializing in DALL-E image generation.
-            Given a social media post, generate a vivid, specific image prompt that would
-            visually complement the post's message. Return only the image prompt, nothing else.
-            """
-        )
-    ] + state["messages"]
+    messages = [SystemMessage(content=GENERATE_IMAGE_PROMPT_SYSTEM_PROMPT)] + state["messages"]
     response = model.invoke(messages)
 
     return {
