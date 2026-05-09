@@ -17,11 +17,7 @@ def make_agent_result(
     }
 
 
-async def test_generate_returns_200_with_valid_token(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    monkeypatch.setenv("API_TOKEN", "test-token")
-
+async def test_generate_returns_200() -> None:
     with patch(
         "api.agent.invoke",
         return_value=make_agent_result(image_url="https://example.com/image.png"),
@@ -29,44 +25,31 @@ async def test_generate_returns_200_with_valid_token(
         async with AsyncClient(
             transport=ASGITransport(app=app), base_url="http://test"
         ) as client:
-            response = await client.post(
-                "/generate",
-                json={"prompt": "Write about AI"},
-                headers={"Authorization": "Bearer test-token"},
-            )
+            response = await client.post("/generate", json={"prompt": "Write about AI"})
 
     assert response.status_code == 200
     data = response.json()
     assert data["text"] == "Here's your post!"
     assert data["image_url"] == "https://example.com/image.png"
     assert data["llm_calls"] == 3
+    assert "request_id" in data
 
 
-async def test_generate_returns_401_with_invalid_token(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    monkeypatch.setenv("API_TOKEN", "real-token")
-
+async def test_generate_rejects_empty_prompt() -> None:
     async with AsyncClient(
         transport=ASGITransport(app=app), base_url="http://test"
     ) as client:
-        response = await client.post(
-            "/generate",
-            json={"prompt": "Write about AI"},
-            headers={"Authorization": "Bearer wrong-token"},
-        )
+        response = await client.post("/generate", json={"prompt": ""})
 
-    assert response.status_code == 401
+    assert response.status_code == 422
 
 
-async def test_generate_returns_401_with_no_token(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    monkeypatch.setenv("API_TOKEN", "real-token")
+async def test_generate_returns_500_on_agent_failure() -> None:
+    with patch("api.agent.invoke", side_effect=Exception("something went wrong")):
+        async with AsyncClient(
+            transport=ASGITransport(app=app), base_url="http://test"
+        ) as client:
+            response = await client.post("/generate", json={"prompt": "Write about AI"})
 
-    async with AsyncClient(
-        transport=ASGITransport(app=app), base_url="http://test"
-    ) as client:
-        response = await client.post("/generate", json={"prompt": "Write about AI"})
-
-    assert response.status_code == 401
+    assert response.status_code == 500
+    assert response.json()["detail"] == "Failed to generate post"

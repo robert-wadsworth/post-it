@@ -1,106 +1,66 @@
 import logging
-import os
 from typing import Optional
+from uuid import uuid4
 
+import anyio
 from dotenv import load_dotenv
 
 load_dotenv()
 
-from fastapi import FastAPI, Header, HTTPException  # noqa: E402
+from fastapi import FastAPI, HTTPException  # noqa: E402
 from langchain_core.messages import HumanMessage  # noqa: E402
-from pydantic import BaseModel  # noqa: E402
+from pydantic import BaseModel, Field  # noqa: E402
 
 from main import agent  # noqa: E402
 
 app = FastAPI(title="Post-It API", version="0.1.0")
-
-if not os.getenv("API_TOKEN"):
-    logging.warning(
-        "API_TOKEN not set — all requests will be accepted. Do not deploy without setting this."
-    )
+logger = logging.getLogger(__name__)
 
 
 class GenerateRequest(BaseModel):
-    prompt: str
+    prompt: str = Field(min_length=1, max_length=4000)
 
 
 class GenerateResponse(BaseModel):
     text: str
     image_url: Optional[str] = None
     llm_calls: int
-
-
-def validate_token(authorization: Optional[str] = Header(None)) -> bool:
-    """Validate API token from Authorization header"""
-    if not authorization:
-        return False
-
-    # Extract token from "Bearer <token>" format
-    try:
-        token = authorization.split(" ")[1] if " " in authorization else authorization
-    except IndexError:
-        return False
-
-    # Get valid token from environment
-    valid_token = os.getenv("API_TOKEN")
-    if not valid_token:
-        # If no token set, allow requests (for testing)
-        return True
-
-    return token == valid_token
-
-
-@app.get("/")
-async def root():
-    """Health check endpoint"""
-    return {"status": "ok", "service": "post-it-api"}
+    request_id: str
 
 
 @app.get("/health")
 async def health():
-    """Health check endpoint for Cloud Run"""
+    """Health check"""
     return {"status": "healthy"}
 
 
 @app.post("/generate", response_model=GenerateResponse)
-async def generate_post(
-    request: GenerateRequest,
-    authorization: Optional[str] = Header(None),
-):
-    """
-    Generate a social media post with text and image.
-    Requires Authorization header with Bearer token.
-    """
-    # Validate token
-    if not validate_token(authorization):
-        raise HTTPException(
-            status_code=401,
-            detail="Invalid or missing authorization token",
-        )
+async def generate_post(request: GenerateRequest):
+    """Generate a social media post with text and image."""
+    request_id = str(uuid4())
+    logger.info("Agent invocation started", extra={"request_id": request_id})
 
     try:
-        # Invoke the agent
         inputs = {"messages": [HumanMessage(content=request.prompt)]}
-        result = agent.invoke(inputs)
+        result = await anyio.to_thread.run_sync(lambda: agent.invoke(inputs))
 
-        # Extract the last text message (the final draft)
         text = ""
         for message in reversed(result.get("messages", [])):
             if hasattr(message, "content"):
                 text = message.content
                 break
 
+        logger.info("Agent invocation completed", extra={"request_id": request_id})
         return GenerateResponse(
             text=text,
             image_url=result.get("image_url"),
             llm_calls=result.get("llm_calls", 0),
+            request_id=request_id,
         )
 
-    except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"Error generating post: {str(e)}",
-        )
+    except Exception:
+        logger.exception("Agent invocation failed", extra={"request_id": request_id})
+        raise HTTPException(status_code=500, detail="Failed to generate post")
 
 
 if __name__ == "__main__":
