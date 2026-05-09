@@ -1,6 +1,6 @@
 import os
 
-from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
+from langchain_core.messages import AIMessage, SystemMessage
 from langchain_openai import ChatOpenAI
 from openai import OpenAI
 from pydantic import BaseModel
@@ -112,12 +112,8 @@ def generate_image_with_openai(state: MessageState) -> MessageState:
         size="1024x1024",
     )
 
-    # Create a message with the image URL
-    image_url = image_response.data[0].url
-    image_message = HumanMessage(content=f"Image generated: {image_url}")
-
     return {
         "node_name": GENERATE_IMAGE,
-        "messages": [image_message],
+        "image_url": image_response.data[0].url,
         "llm_calls": state.get("llm_calls", 0),
     }

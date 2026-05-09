@@ -7,7 +7,6 @@ import os
 from typing import Optional
 
 from fastapi import FastAPI, Header, HTTPException
-from fastapi.responses import JSONResponse
 from langchain_core.messages import HumanMessage
 from pydantic import BaseModel
 
@@ -80,29 +79,16 @@ async def generate_post(
         inputs = {"messages": [HumanMessage(content=request.prompt)]}
         result = agent.invoke(inputs)
 
-        # Extract text and image URL from result
+        # Extract the last text message (the final draft)
         text = ""
-        image_url = None
-
-        # Find the last text message (should be the post)
         for message in reversed(result.get("messages", [])):
-            if hasattr(message, "content") and not message.content.startswith(
-                "Image generated:"
-            ):
+            if hasattr(message, "content"):
                 text = message.content
-                break
-
-        # Find the image URL if generated
-        for message in result.get("messages", []):
-            if hasattr(message, "content") and message.content.startswith(
-                "Image generated:"
-            ):
-                image_url = message.content.replace("Image generated: ", "")
                 break
 
         return GenerateResponse(
             text=text,
-            image_url=image_url,
+            image_url=result.get("image_url"),
             llm_calls=result.get("llm_calls", 0),
         )
 
