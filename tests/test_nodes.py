@@ -12,12 +12,18 @@ from nodes.content_nodes import (
 from schemas import ReviewDecision
 
 
-def make_state(messages: list | None = None, llm_calls: int = 0) -> dict:
+def make_state(
+    messages: list | None = None, llm_calls: int = 0, revision_count: int = 0
+) -> dict:
     return {
         "messages": messages or [],
         "llm_calls": llm_calls,
         "approved": False,
         "image_url": None,
+        "draft_text": "",
+        "image_prompt": "",
+        "review_feedback": "",
+        "revision_count": revision_count,
     }
 
 
@@ -32,6 +38,7 @@ def test_draft_text_node(mock_model: MagicMock) -> None:
 
     assert result["messages"] == [mock_response]
     assert result["llm_calls"] == 1
+    assert result["draft_text"] == "Draft post content"
 
 
 @patch("nodes.content_nodes.model")
@@ -47,6 +54,8 @@ def test_review_draft_node_approved(mock_model: MagicMock) -> None:
     assert result["approved"] is True
     assert result["messages"][0].content == "Looks great!"
     assert result["llm_calls"] == 1
+    assert result["review_feedback"] == "Looks great!"
+    assert result["revision_count"] == 1
 
 
 @patch("nodes.content_nodes.model")
@@ -61,6 +70,8 @@ def test_review_draft_node_not_approved(mock_model: MagicMock) -> None:
 
     assert result["approved"] is False
     assert result["messages"][0].content == "Needs more detail."
+    assert result["review_feedback"] == "Needs more detail."
+    assert result["revision_count"] == 1
 
 
 @patch("nodes.content_nodes.model")
@@ -76,6 +87,7 @@ def test_generate_image_prompt_node(mock_model: MagicMock) -> None:
 
     assert result["messages"] == [mock_response]
     assert result["llm_calls"] == 1
+    assert result["image_prompt"] == "A vivid digital painting of robots collaborating"
 
 
 @patch("nodes.content_nodes.client")

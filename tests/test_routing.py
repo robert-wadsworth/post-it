@@ -2,12 +2,16 @@ from main import should_continue
 from nodes.constants import GENERATE_IMAGE_PROMPT, REVIEW_DRAFT
 
 
-def make_state(approved: bool = False, llm_calls: int = 0) -> dict:
+def make_state(approved: bool = False, revision_count: int = 0) -> dict:
     return {
         "messages": [],
-        "llm_calls": llm_calls,
+        "llm_calls": 0,
         "approved": approved,
         "image_url": None,
+        "draft_text": "",
+        "image_prompt": "",
+        "review_feedback": "",
+        "revision_count": revision_count,
     }
 
 
@@ -16,8 +20,9 @@ def test_routes_to_image_prompt_when_approved():
 
 
 def test_routes_to_image_prompt_via_escape_hatch():
-    assert should_continue(make_state(llm_calls=6)) == GENERATE_IMAGE_PROMPT
+    # max_revisions defaults to 3; revision_count >= 3 triggers escape
+    assert should_continue(make_state(revision_count=3)) == GENERATE_IMAGE_PROMPT
 
 
 def test_routes_to_review_when_not_approved():
-    assert should_continue(make_state(approved=False, llm_calls=2)) == REVIEW_DRAFT
+    assert should_continue(make_state(approved=False, revision_count=1)) == REVIEW_DRAFT

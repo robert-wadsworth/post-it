@@ -18,12 +18,16 @@ from nodes.content_nodes import (  # noqa: E402
     generate_image_with_openai,
     review_draft_node,
 )
+from settings import settings  # noqa: E402
 from state import MessageState  # noqa: E402
 
 
 def should_continue(state: MessageState) -> str:
     """Determine if the agent should continue"""
-    if state.get("approved", False) or state.get("llm_calls", 0) > 5:
+    if (
+        state.get("approved", False)
+        or state.get("revision_count", 0) >= settings.max_revisions
+    ):
         return GENERATE_IMAGE_PROMPT
     return REVIEW_DRAFT
 
