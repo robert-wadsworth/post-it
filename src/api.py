@@ -15,7 +15,9 @@ from main import agent  # noqa: E402
 app = FastAPI(title="Post-It API", version="0.1.0")
 
 if not os.getenv("API_TOKEN"):
-    logging.warning("API_TOKEN not set — all requests will be accepted. Do not deploy without setting this.")
+    logging.warning(
+        "API_TOKEN not set — all requests will be accepted. Do not deploy without setting this."
+    )
 
 
 class GenerateRequest(BaseModel):
