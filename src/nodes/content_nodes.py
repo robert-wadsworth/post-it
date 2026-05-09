@@ -8,11 +8,12 @@ from nodes.prompts import (
     REVIEW_DRAFT_SYSTEM_PROMPT,
 )
 from schemas import ReviewDecision
+from settings import settings
 from state import MessageState
 
 client = OpenAI()
 
-model = ChatOpenAI(model="gpt-4o-mini", temperature=0.7)
+model = ChatOpenAI(model=settings.model_name, temperature=0.7)
 
 
 def draft_text_node(state: MessageState) -> MessageState:
@@ -70,13 +71,15 @@ def generate_image_with_openai(state: MessageState) -> MessageState:
         last_message.content if hasattr(last_message, "content") else str(last_message)
     )
 
-    # Generate the image using OpenAI
     image_response = client.images.generate(
-        model="dall-e-3",
+        model=settings.image_model,
         prompt=prompt,
         n=1,
-        size="1024x1024",
+        size=settings.image_size,
     )
+
+    if not image_response.data:
+        raise ValueError("Image generation returned no data")
 
     return {
         "image_url": image_response.data[0].url,
