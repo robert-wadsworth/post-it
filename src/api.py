@@ -1,17 +1,16 @@
-from dotenv import load_dotenv
-
-# Load environment variables BEFORE any other imports
-load_dotenv()
-
 import logging
 import os
 from typing import Optional
 
-from fastapi import FastAPI, Header, HTTPException
-from langchain_core.messages import HumanMessage
-from pydantic import BaseModel
+from dotenv import load_dotenv
 
-from main import agent
+load_dotenv()
+
+from fastapi import FastAPI, Header, HTTPException  # noqa: E402
+from langchain_core.messages import HumanMessage  # noqa: E402
+from pydantic import BaseModel  # noqa: E402
+
+from main import agent  # noqa: E402
 
 app = FastAPI(title="Post-It API", version="0.1.0")
 
