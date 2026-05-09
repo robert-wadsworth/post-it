@@ -4,7 +4,6 @@ from nodes.constants import GENERATE_IMAGE_PROMPT, REVIEW_DRAFT
 
 def make_state(approved: bool = False, llm_calls: int = 0) -> dict:
     return {
-        "node_name": "",
         "messages": [],
         "llm_calls": llm_calls,
         "approved": approved,

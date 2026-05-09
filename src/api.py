@@ -29,7 +29,6 @@ class GenerateResponse(BaseModel):
     llm_calls: int
 
 
-# Simple token validation (you'll enhance this later)
 def validate_token(authorization: Optional[str] = Header(None)) -> bool:
     """Validate API token from Authorization header"""
     if not authorization:
