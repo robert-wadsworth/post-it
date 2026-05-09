@@ -26,7 +26,9 @@ def test_draft_text_node(mock_model: MagicMock) -> None:
     mock_response = AIMessage(content="Draft post content")
     mock_model.invoke.return_value = mock_response
 
-    result = draft_text_node(make_state(messages=[HumanMessage(content="Write about AI")]))
+    result = draft_text_node(
+        make_state(messages=[HumanMessage(content="Write about AI")])
+    )
 
     assert result["messages"] == [mock_response]
     assert result["llm_calls"] == 1
@@ -38,7 +40,9 @@ def test_review_draft_node_approved(mock_model: MagicMock) -> None:
         feedback="Looks great!", approved=True
     )
 
-    result = review_draft_node(make_state(messages=[HumanMessage(content="Draft post")]))
+    result = review_draft_node(
+        make_state(messages=[HumanMessage(content="Draft post")])
+    )
 
     assert result["approved"] is True
     assert result["messages"][0].content == "Looks great!"
@@ -51,7 +55,9 @@ def test_review_draft_node_not_approved(mock_model: MagicMock) -> None:
         feedback="Needs more detail.", approved=False
     )
 
-    result = review_draft_node(make_state(messages=[HumanMessage(content="Draft post")]))
+    result = review_draft_node(
+        make_state(messages=[HumanMessage(content="Draft post")])
+    )
 
     assert result["approved"] is False
     assert result["messages"][0].content == "Needs more detail."
@@ -59,10 +65,14 @@ def test_review_draft_node_not_approved(mock_model: MagicMock) -> None:
 
 @patch("nodes.content_nodes.model")
 def test_generate_image_prompt_node(mock_model: MagicMock) -> None:
-    mock_response = AIMessage(content="A vivid digital painting of robots collaborating")
+    mock_response = AIMessage(
+        content="A vivid digital painting of robots collaborating"
+    )
     mock_model.invoke.return_value = mock_response
 
-    result = generate_image_prompt_node(make_state(messages=[HumanMessage(content="Post about AI")]))
+    result = generate_image_prompt_node(
+        make_state(messages=[HumanMessage(content="Post about AI")])
+    )
 
     assert result["messages"] == [mock_response]
     assert result["llm_calls"] == 1
@@ -70,7 +80,9 @@ def test_generate_image_prompt_node(mock_model: MagicMock) -> None:
 
 @patch("nodes.content_nodes.client")
 def test_generate_image_with_openai(mock_client: MagicMock) -> None:
-    mock_client.images.generate.return_value.data = [MagicMock(url="https://example.com/image.png")]
+    mock_client.images.generate.return_value.data = [
+        MagicMock(url="https://example.com/image.png")
+    ]
 
     result = generate_image_with_openai(
         make_state(messages=[HumanMessage(content="A vivid digital painting")])

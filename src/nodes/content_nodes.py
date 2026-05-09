@@ -33,7 +33,9 @@ def review_draft_node(state: MessageState) -> MessageState:
 
     messages = [SystemMessage(content=REVIEW_DRAFT_SYSTEM_PROMPT)] + state["messages"]
 
-    decision: ReviewDecision = model.with_structured_output(ReviewDecision).invoke(messages)
+    decision: ReviewDecision = model.with_structured_output(ReviewDecision).invoke(
+        messages
+    )
 
     return {
         "messages": [AIMessage(content=decision.feedback)],
@@ -45,7 +47,9 @@ def review_draft_node(state: MessageState) -> MessageState:
 def generate_image_prompt_node(state: MessageState) -> MessageState:
     """Generate a prompt for an image to accompany the post"""
 
-    messages = [SystemMessage(content=GENERATE_IMAGE_PROMPT_SYSTEM_PROMPT)] + state["messages"]
+    messages = [SystemMessage(content=GENERATE_IMAGE_PROMPT_SYSTEM_PROMPT)] + state[
+        "messages"
+    ]
     response = model.invoke(messages)
 
     return {
