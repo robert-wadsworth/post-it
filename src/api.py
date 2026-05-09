@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 # Load environment variables BEFORE any other imports
 load_dotenv()
 
+import logging
 import os
 from typing import Optional
 
@@ -13,6 +14,9 @@ from pydantic import BaseModel
 from main import agent
 
 app = FastAPI(title="Post-It API", version="0.1.0")
+
+if not os.getenv("API_TOKEN"):
+    logging.warning("API_TOKEN not set — all requests will be accepted. Do not deploy without setting this.")
 
 
 class GenerateRequest(BaseModel):
