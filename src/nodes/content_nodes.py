@@ -1,8 +1,9 @@
 import os
 
-from langchain_core.messages import HumanMessage, SystemMessage
+from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 from langchain_openai import ChatOpenAI
 from openai import OpenAI
+from pydantic import BaseModel
 
 from nodes.constants import (
     DRAFT_TEXT,
@@ -14,8 +15,12 @@ from state import MessageState
 
 client = OpenAI()
 
-
 model = ChatOpenAI(model="gpt-4o-mini", temperature=0.7)
+
+
+class ReviewDecision(BaseModel):
+    feedback: str
+    approved: bool
 
 
 def draft_text_node(state: MessageState) -> MessageState:
@@ -56,11 +61,12 @@ def review_draft_node(state: MessageState) -> MessageState:
         )
     ] + state["messages"]
 
-    response = model.invoke(messages)
+    decision: ReviewDecision = model.with_structured_output(ReviewDecision).invoke(messages)
 
     return {
         "node_name": REVIEW_DRAFT,
-        "messages": [response],
+        "messages": [AIMessage(content=decision.feedback)],
+        "approved": decision.approved,
         "llm_calls": state.get("llm_calls", 0) + 1,
     }
 
