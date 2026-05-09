@@ -26,6 +26,7 @@ def draft_text_node(state: MessageState) -> MessageState:
     return {
         "messages": [response],
         "llm_calls": state.get("llm_calls", 0) + 1,
+        "draft_text": response.content,
     }
 
 
@@ -42,6 +43,8 @@ def review_draft_node(state: MessageState) -> MessageState:
         "messages": [AIMessage(content=decision.feedback)],
         "approved": decision.approved,
         "llm_calls": state.get("llm_calls", 0) + 1,
+        "review_feedback": decision.feedback,
+        "revision_count": state.get("revision_count", 0) + 1,
     }
 
 
@@ -56,6 +59,7 @@ def generate_image_prompt_node(state: MessageState) -> MessageState:
     return {
         "messages": [response],
         "llm_calls": state.get("llm_calls", 0) + 1,
+        "image_prompt": response.content,
     }
 
 

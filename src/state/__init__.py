@@ -9,3 +9,7 @@ class MessageState(TypedDict):
     llm_calls: int
     approved: bool
     image_url: Optional[str]
+    draft_text: str
+    image_prompt: str
+    review_feedback: str
+    revision_count: int
