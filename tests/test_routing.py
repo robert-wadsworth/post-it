@@ -1,5 +1,5 @@
 from main import should_continue
-from nodes.constants import GENERATE_IMAGE_PROMPT, REVIEW_DRAFT
+from nodes.constants import DRAFT_TEXT, GENERATE_IMAGE_PROMPT
 
 
 def make_state(approved: bool = False, revision_count: int = 0) -> dict:
@@ -24,5 +24,5 @@ def test_routes_to_image_prompt_via_escape_hatch():
     assert should_continue(make_state(revision_count=3)) == GENERATE_IMAGE_PROMPT
 
 
-def test_routes_to_review_when_not_approved():
-    assert should_continue(make_state(approved=False, revision_count=1)) == REVIEW_DRAFT
+def test_routes_to_draft_when_not_approved():
+    assert should_continue(make_state(approved=False, revision_count=1)) == DRAFT_TEXT

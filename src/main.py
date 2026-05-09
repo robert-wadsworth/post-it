@@ -23,13 +23,13 @@ from state import MessageState  # noqa: E402
 
 
 def should_continue(state: MessageState) -> str:
-    """Determine if the agent should continue"""
+    """Route after review: proceed to image generation if approved or at the revision limit, otherwise revise."""
     if (
         state.get("approved", False)
         or state.get("revision_count", 0) >= settings.max_revisions
     ):
         return GENERATE_IMAGE_PROMPT
-    return REVIEW_DRAFT
+    return DRAFT_TEXT
 
 
 # build the agent
@@ -43,12 +43,12 @@ agent_builder.add_node(GENERATE_IMAGE, generate_image_with_openai)
 agent_builder.set_entry_point(DRAFT_TEXT)
 
 # add edges
+agent_builder.add_edge(DRAFT_TEXT, REVIEW_DRAFT)
 agent_builder.add_conditional_edges(
-    DRAFT_TEXT,
+    REVIEW_DRAFT,
     should_continue,
-    path_map={GENERATE_IMAGE_PROMPT: GENERATE_IMAGE_PROMPT, REVIEW_DRAFT: REVIEW_DRAFT},
+    path_map={GENERATE_IMAGE_PROMPT: GENERATE_IMAGE_PROMPT, DRAFT_TEXT: DRAFT_TEXT},
 )
-agent_builder.add_edge(REVIEW_DRAFT, DRAFT_TEXT)
 agent_builder.add_edge(GENERATE_IMAGE_PROMPT, GENERATE_IMAGE)
 agent_builder.add_edge(GENERATE_IMAGE, END)
 
