@@ -85,7 +85,15 @@ def generate_image_with_openai(state: MessageState) -> MessageState:
     if not image_response.data:
         raise ValueError("Image generation returned no data")
 
+    image_data = image_response.data[0]
+    if image_data.url:
+        image_url = image_data.url
+    elif image_data.b64_json:
+        image_url = f"data:image/png;base64,{image_data.b64_json}"
+    else:
+        raise ValueError("Image generation returned neither url nor b64_json")
+
     return {
-        "image_url": image_response.data[0].url,
+        "image_url": image_url,
         "llm_calls": state.get("llm_calls", 0),
     }
