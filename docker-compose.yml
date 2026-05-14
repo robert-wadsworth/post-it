@@ -5,3 +5,15 @@ services:
       - "8080:8080"
     env_file:
       - .env
+
+  ui:
+    build: .
+    command: ["uv", "run", "python", "src/ui.py"]
+    ports:
+      - "7860:7860"
+    env_file:
+      - .env
+    environment:
+      - API_URL=http://api:8080
+    depends_on:
+      - api

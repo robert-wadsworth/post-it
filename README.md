@@ -65,13 +65,30 @@ Endpoints:
 - `GET /health` — Cloud Run health check
 - `POST /generate` — generate a post (text + optional image URL)
 
+### Run the Gradio UI
+
+Requires the API to be running first.
+
+```bash
+uv run python src/ui.py
+```
+
+Open `http://localhost:7860` in your browser. Enter a prompt and click **Generate** to see the post and image.
+
 ### Run with Docker
+
+Starts both the API and Gradio UI together:
 
 ```bash
 docker compose up --build
 ```
 
-The API will be available at `http://localhost:8080`. Pass environment variables via a `.env` file in the project root (see Setup above).
+| Service | URL |
+| --- | --- |
+| API | `http://localhost:8080` |
+| Gradio UI | `http://localhost:7860` |
+
+Pass environment variables via a `.env` file in the project root (see Setup above).
 
 ## Project Structure
 
@@ -79,6 +96,7 @@ The API will be available at `http://localhost:8080`. Pass environment variables
 src/
 ├── main.py        # LangGraph agent definition + CLI entry point
 ├── api.py         # FastAPI wrapper exposing the agent over HTTP
+├── ui.py          # Gradio web UI
 ├── agents/        # Agent-level orchestration
 ├── nodes/         # LangGraph node implementations (draft, review, image)
 ├── schemas/       # Pydantic schemas
@@ -111,4 +129,5 @@ uv add --dev <package>
 - Drafts post text with GPT and iteratively reviews/refines it
 - Generates a matching image via DALL-E
 - Exposes the agent through a FastAPI HTTP endpoint with bearer-token auth
+- Gradio web UI for interactive post generation
 - Built with LangChain and LangGraph
