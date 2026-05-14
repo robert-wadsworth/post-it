@@ -1,13 +1,10 @@
 {
   "[python]": {
-    "editor.defaultFormatter": "charliermarsh.ruff", // Handles main formatting
+    "editor.defaultFormatter": "charliermarsh.ruff",
     "editor.formatOnSave": true,
     "editor.codeActionsOnSave": {
-        // This is the key setting that triggers import sorting (isort logic)
-        // and other fixes when using Ruff.
-        "source.organizeImports": "explicit", 
-        // OR the broader fix-all command:
-        "source.fixAll": "explicit" 
+      "source.fixAll": "always",
+      "source.organizeImports": "always"
     }
   }
 }

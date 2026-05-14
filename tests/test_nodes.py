@@ -113,7 +113,9 @@ def test_generate_image_raises_on_empty_data(mock_client: MagicMock) -> None:
     mock_client.images.generate.return_value.data = []
 
     with pytest.raises(ValueError, match="no data"):
-        generate_image_with_openai(make_state(messages=[HumanMessage(content="A prompt")]))
+        generate_image_with_openai(
+            make_state(messages=[HumanMessage(content="A prompt")])
+        )
 
 
 @patch("nodes.content_nodes.client")
@@ -121,4 +123,6 @@ def test_generate_image_raises_on_provider_error(mock_client: MagicMock) -> None
     mock_client.images.generate.side_effect = RuntimeError("provider error")
 
     with pytest.raises(RuntimeError, match="provider error"):
-        generate_image_with_openai(make_state(messages=[HumanMessage(content="A prompt")]))
+        generate_image_with_openai(
+            make_state(messages=[HumanMessage(content="A prompt")])
+        )
