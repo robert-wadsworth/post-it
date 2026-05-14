@@ -9,7 +9,9 @@ from settings import settings
 
 
 def _stub_image_client(mock_client: MagicMock) -> None:
-    mock_client.images.generate.return_value.data = [MagicMock(url="https://example.com/img.png")]
+    mock_client.images.generate.return_value.data = [
+        MagicMock(url="https://example.com/img.png")
+    ]
 
 
 def sequential(*responses):
@@ -28,7 +30,9 @@ def sequential(*responses):
 
 @patch("nodes.content_nodes.client")
 @patch("nodes.content_nodes.model")
-def test_graph_reject_once_then_approve(mock_model: MagicMock, mock_client: MagicMock) -> None:
+def test_graph_reject_once_then_approve(
+    mock_model: MagicMock, mock_client: MagicMock
+) -> None:
     """
     Graph flow (DRAFT_TEXT → REVIEW_DRAFT → conditional):
       1. DRAFT_TEXT: model.invoke → "First draft"
@@ -61,7 +65,9 @@ def test_graph_reject_once_then_approve(mock_model: MagicMock, mock_client: Magi
 
 @patch("nodes.content_nodes.client")
 @patch("nodes.content_nodes.model")
-def test_graph_escape_hatch_fires_at_max_revisions(mock_model: MagicMock, mock_client: MagicMock) -> None:
+def test_graph_escape_hatch_fires_at_max_revisions(
+    mock_model: MagicMock, mock_client: MagicMock
+) -> None:
     """All reviews reject; graph escapes to image generation after max_revisions."""
     _stub_image_client(mock_client)
     mock_model.invoke.return_value = AIMessage(content="Draft content")
@@ -78,7 +84,9 @@ def test_graph_escape_hatch_fires_at_max_revisions(mock_model: MagicMock, mock_c
 
 @patch("nodes.content_nodes.client")
 @patch("nodes.content_nodes.model")
-def test_graph_draft_text_is_explicit_not_scanned(mock_model: MagicMock, mock_client: MagicMock) -> None:
+def test_graph_draft_text_is_explicit_not_scanned(
+    mock_model: MagicMock, mock_client: MagicMock
+) -> None:
     """draft_text is written by the node directly — not derived from message history."""
     _stub_image_client(mock_client)
     mock_model.invoke.side_effect = sequential(
