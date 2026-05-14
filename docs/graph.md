@@ -1,6 +1,6 @@
 # Post Generation Graph
 
-The agent uses a LangGraph state machine to draft, review, and illustrate a social media post.
+The agent uses a LangGraph state machine to draft, review, and illustrate a social media post. It is exposed via a FastAPI endpoint (`POST /generate`) and a Gradio web UI (`src/ui.py`).
 
 ## Flow
 
