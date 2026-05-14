@@ -6,6 +6,7 @@ An autonomous posting agent that generates social media content (text + image) u
 
 - Python 3.11+
 - [uv](https://docs.astral.sh/uv/) for dependency management
+- Docker (optional, for containerised usage)
 
 ## Setup
 
@@ -63,6 +64,14 @@ Endpoints:
 - `GET /` — service health check
 - `GET /health` — Cloud Run health check
 - `POST /generate` — generate a post (text + optional image URL)
+
+### Run with Docker
+
+```bash
+docker compose up --build
+```
+
+The API will be available at `http://localhost:8080`. Pass environment variables via a `.env` file in the project root (see Setup above).
 
 ## Project Structure
 
