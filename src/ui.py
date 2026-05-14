@@ -42,9 +42,7 @@ with gr.Blocks(title="Post-It") as demo:
     generate_btn = gr.Button("Generate", variant="primary")
 
     with gr.Row():
-        post_output = gr.Textbox(
-            label="Generated Post", lines=10, show_copy_button=True
-        )
+        post_output = gr.Textbox(label="Generated Post", lines=10)
         image_output = gr.Image(label="Generated Image")
 
     stats_output = gr.Textbox(label="Stats", interactive=False, lines=1)
